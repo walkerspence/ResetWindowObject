@@ -13,12 +13,8 @@ module.exports = {
     url: 'https://me.com/',
     userAgent: 'node.js',
   },
-  testTimeout: 30000,
   transform: {
-    '^.+\\.js$': 'babel-jest',
-    '^.+\\.jsx$': 'babel-jest',
-    '^.+\\.ts$': 'babel-jest',
-    '^.+\\.tsx$': 'babel-jest',
+    "^.+\\.(js|jsx)$": "babel-jest",
   },
   globals: {
     TextEncoder: require("util").TextEncoder,
