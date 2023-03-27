@@ -44,6 +44,12 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  while (document.body.firstChild) {
+    document.body.removeChild(document.body.firstChild)
+  }
+  while (document.head.firstChild) {
+    document.head.removeChild(document.head.firstChild)
+  }
   Object.keys(documentEventListeners).forEach(eventName => {
     documentEventListeners[eventName].forEach(cb => {
       document.removeEventListener(eventName, cb);
@@ -60,12 +66,12 @@ afterEach(() => {
   Object.keys(document)
     .filter(key => !documentKeys.includes(key))
     .forEach(key => {
-      delete document[key];
+      document[key] = undefined; // Sometimes `delete` will show errors on certain window/document properties, so re-assign instead
     });
   Object.keys(window)
     .filter(key => !windowKeys.includes(key))
     .forEach(key => {
-      delete window[key];
+      window[key] = undefined;
     });
   jest.restoreAllMocks();
 });
