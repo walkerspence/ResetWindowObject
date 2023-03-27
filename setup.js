@@ -29,6 +29,8 @@ import { JSDOM } from 'jsdom';
 const originalDocumentAddEventListener = document.addEventListener
 
 let documentEventListeners = {};
+let documentKeys = [...Object.keys(document), 'addEventListener']; // for some reason addEventListener isn't in the document keys, even though document.addEventListener exists
+let windowKeys = Object.keys(window);
 
 beforeEach(() => {
   documentEventListeners = {}
@@ -52,7 +54,18 @@ afterEach(() => {
     still fires when you click the window in Test 2, but not when you click the
     document. This appears to be more of a full reset.
   */
-  window._sessionHistory._windowImpl._eventListeners = Object.create( null
+  window._sessionHistory._windowImpl._eventListeners = Object.create(
+    null
   );
+  Object.keys(document)
+    .filter(key => !documentKeys.includes(key))
+    .forEach(key => {
+      delete document[key];
+    });
+  Object.keys(window)
+    .filter(key => !windowKeys.includes(key))
+    .forEach(key => {
+      delete window[key];
+    });
   jest.restoreAllMocks();
 });

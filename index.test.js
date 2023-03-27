@@ -10,6 +10,7 @@ const MyComponent = ({ set }) => {
   useEffect(() => {
     if (set) {
       window.something = 'hi';
+      document.something = 'hello'
 
       window.addEventListener('click', () => {
         console.log('clicked window')
@@ -26,6 +27,11 @@ const MyComponent = ({ set }) => {
         }
         divRef.current.setAttribute('clicked-document', 'true')
       });
+
+      const myDiv = document.createElement('div')
+      myDiv.setAttribute('data-testid', 'created-element')
+
+      document.body.appendChild(myDiv)
     }
   }, [set])
 
@@ -38,7 +44,8 @@ describe('my describe',  () => {
     render(<MyComponent set={true} />)
     screen.getByText('Hello World')
     expect(window.something).toEqual('hi')
-
+    expect(document.something).toEqual('hello')
+    screen.getByTestId('created-element')
     fireEvent(
       window,
       new MouseEvent('click', {
@@ -55,16 +62,21 @@ describe('my describe',  () => {
     )
     expect(screen.getByText('Hello World').getAttribute('clicked-window')).toEqual('true')
     expect(screen.getByText('Hello World').getAttribute('clicked-document')).toEqual('true')
+    await wait(1000); // makes errors less likely to be hidden by RTL cleanup
     console.log('----------------------------END --------------------------');
 
   })
 
   test('my test 2', async () => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild)
+    }
     console.log('--------------------------TEST 2--------------------------');
     render(<MyComponent set={false} />)
     screen.getByText('Hello World')
-    expect(window.something).toEqual('hi') // BAD
-
+    expect(window.something).toEqual(undefined)
+    expect(document.something).toEqual(undefined)
+    expect(screen.queryByTestId('created-element')).toEqual(null)
     fireEvent(
       window,
       new MouseEvent('click', {
@@ -81,6 +93,7 @@ describe('my describe',  () => {
     )
     expect(screen.getByText('Hello World').getAttribute('clicked-window')).toEqual(null)
     expect(screen.getByText('Hello World').getAttribute('clicked-document')).toEqual(null)
+    await wait(1000); // makes errors less likely to be hidden by RTL cleanup
     console.log('----------------------------END --------------------------');
   })
 })
