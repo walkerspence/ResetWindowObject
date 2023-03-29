@@ -33,6 +33,7 @@ let documentKeys = [...Object.keys(document), 'addEventListener']; // for some r
 let windowKeys = Object.keys(window);
 
 beforeEach(() => {
+  window._runScripts = 'none'
   documentEventListeners = {}
   jest.spyOn(document, 'addEventListener').mockImplementation((event, cb) => {
     if (!documentEventListeners[event]) {
@@ -44,12 +45,17 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  /* If you see failing assertions here, you need to clean up whatever as added
+  to the window/document during your test */
+  // expect(document.body.firstChild).toEqual(null)
+  // expect(document.head.firstChild).toEqual(null)
   while (document.body.firstChild) {
     document.body.removeChild(document.body.firstChild)
   }
   while (document.head.firstChild) {
     document.head.removeChild(document.head.firstChild)
   }
+  // expect(documentEventListeners).toEqual({})
   Object.keys(documentEventListeners).forEach(eventName => {
     documentEventListeners[eventName].forEach(cb => {
       document.removeEventListener(eventName, cb);
@@ -62,7 +68,10 @@ afterEach(() => {
   */
   window._sessionHistory._windowImpl._eventListeners = Object.create(
     null
-  );
+  ); // required reset for PDFjs
+  // expect(Object.keys(document).filter(key => !documentKeys.includes(key))).toEqual([])
+  // expect(Object.keys(window).filter(key => !windowKeys.includes(key))).toEqual([])
+
   Object.keys(document)
     .filter(key => !documentKeys.includes(key))
     .forEach(key => {

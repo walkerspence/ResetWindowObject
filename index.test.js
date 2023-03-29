@@ -1,5 +1,6 @@
 import { screen, render, fireEvent, within } from '@testing-library/react'
 import { useEffect, useRef } from 'react'
+import { inspect } from 'util'
 
 const wait = (duration = 0) =>
   new Promise((resolve) => setTimeout(resolve, duration));
@@ -85,7 +86,7 @@ describe('my describe',  () => {
     expect(document.something).toEqual(undefined)
     expect(screen.queryByTestId('created-body-element')).toEqual(null)
     expect(within(document.head).queryByTestId('created-head-element')).toEqual(null)
-    // expect(within(document.head).queryByTestId('created-script')).toEqual(null)
+    expect(within(document.head).queryByTestId('created-script')).toEqual(null)
     fireEvent(
       window,
       new MouseEvent('click', {
